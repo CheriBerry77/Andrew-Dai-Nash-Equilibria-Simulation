@@ -1,0 +1,7 @@
+# Stag and Hare Game
+
+2
+Stag and Hare
+
+stag   3   3   0   2
+hare   2   0   1   1

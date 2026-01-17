@@ -1,0 +1,7 @@
+# Battle of the Sexes
+
+2
+Battle of the Sexes
+
+opera   3   2   0   0
+football 0   0   2   3

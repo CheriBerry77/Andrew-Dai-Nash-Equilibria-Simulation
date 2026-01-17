@@ -1,0 +1,9 @@
+# Prisoner's Dilemma
+# Format:
+# strategy  P1_P2choice1  P2_P2choice1  P1_P2choice2  P2_P2choice2
+
+2
+Prisoners Dilemma
+
+quiet    -1   -1   -12   0
+confess   0  -12    -8  -8
