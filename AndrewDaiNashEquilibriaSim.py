@@ -69,7 +69,6 @@ class Player:
         self.total_score += payoff
         self.num_games += 1
 
-
 def parse_game_file(filename):
     """
     Parses a game definition file
@@ -104,7 +103,6 @@ def parse_game_file(filename):
         "payoff_matrix": payoff_matrix,
     }
 
-
 def play_game(player1, player2, game):
     """
     Plays a single game between two players
@@ -126,7 +124,6 @@ def play_game(player1, player2, game):
     player1.update_preferences(s1, payoff1)
     player2.update_preferences(s2, payoff2)
 
-
 def run_round_robin(players, game):
     """
     Runs a complete round robin tournament
@@ -139,7 +136,6 @@ def run_round_robin(players, game):
     for i in range(num_players):
         for j in range(i + 1, num_players):
             play_game(players[i], players[j], game)
-
 
 def main():
     if len(sys.argv) < 2:
@@ -165,7 +161,6 @@ def main():
             f"{p.name}: preferences={p.preferences}, "
             f"avg_score={p.total_score / p.num_games:.2f}"
         )
-
 
 if __name__ == "__main__":
     main()
