@@ -1,5 +1,6 @@
 """
 Author: Andrew Dai
+Date: 01/20/2026
 
 AI Usage:
 None
@@ -7,19 +8,19 @@ None
 
 import sys
 import random
+import matplotlib.pyplot as plt
+
+#for RPS
+try:
+    import ternary
+except ImportError:
+    ternary = None
+
 
 class Player:
-    """
-    Represents a player in the simulation
-    """
-    def __init__(self, name, num_choices):
-        """
-        Initializes a player
+    #represents a player in the simulation
 
-        Arguments:
-        name (str): player identifier
-        num_choices (int): number of strategies
-        """
+    def __init__(self, name, num_choices):
         self.name = name
         self.num_choices = num_choices
         self.preferences = [1 / num_choices] * num_choices
@@ -28,12 +29,6 @@ class Player:
         self.preference_history = []
 
     def choose_strategy(self):
-        """
-        Chooses a strategy index
-
-        Returns:
-        int: chosen strategy index
-        """
         return random.choices(
             range(self.num_choices),
             weights=self.preferences,
@@ -41,17 +36,11 @@ class Player:
         )[0]
 
     def update_preferences(self, strategy_index, payoff):
-        """
-        Updates strategy preferences after a game
-
-        Arguments:
-        strategy_index (int): strategy used
-        payoff (float): payoff received
-        """
         avg_score = (
             self.total_score / self.num_games
             if self.num_games > 0 else 0
         )
+
         delta = (payoff - avg_score) / 100
         self.preferences[strategy_index] += delta
 
@@ -70,15 +59,6 @@ class Player:
         self.num_games += 1
 
 def parse_game_file(filename):
-    """
-    Parses a game definition file
-
-    Arguments:
-    filename (str): path to the game file
-
-    Returns:
-    dict: parsed game data
-    """
     lines = []
     with open(filename, "r") as file:
         for line in file:
@@ -104,20 +84,10 @@ def parse_game_file(filename):
     }
 
 def play_game(player1, player2, game):
-    """
-    Plays a single game between two players
-
-    Argument:
-    player1 (Player)
-    player2 (Player)
-    game (dict)
-    """
     s1 = player1.choose_strategy()
     s2 = player2.choose_strategy()
 
-    idx = s1 * game["num_choices"] * 2 + s2 * 2
     row = game["payoff_matrix"][s1]
-
     payoff1 = row[2 * s2]
     payoff2 = row[2 * s2 + 1]
 
@@ -125,17 +95,54 @@ def play_game(player1, player2, game):
     player2.update_preferences(s2, payoff2)
 
 def run_round_robin(players, game):
-    """
-    Runs a complete round robin tournament
-
-    Args:
-    players (list[Player])
-    game (dict)
-    """
-    num_players = len(players)
-    for i in range(num_players):
-        for j in range(i + 1, num_players):
+    for i in range(len(players)):
+        for j in range(i + 1, len(players)):
             play_game(players[i], players[j], game)
+
+#plotting
+
+def plot_pair(player1, player2, strategies, title):
+    #scatter plot for 2-strategy games
+    p1_vals = [p[0] for p in player1.preference_history]
+    p2_vals = [p[0] for p in player2.preference_history]
+
+    sizes = [10 + i for i in range(len(p1_vals))]
+
+    plt.figure()
+    plt.scatter(
+        p1_vals,
+        p2_vals,
+        s=sizes,
+        alpha=0.4
+    )
+    plt.xlabel(f"{player1.name} prob({strategies[0]})")
+    plt.ylabel(f"{player2.name} prob({strategies[0]})")
+    plt.title(title)
+    plt.grid(True)
+    plt.show()
+
+
+def plot_rps(players):
+    #ternary plot for RPS
+
+    scale = 1
+    fig, tax = ternary.figure(scale=scale)
+    tax.set_title("RPS Mixed Strategy Convergence", fontsize=14)
+
+    for p in players:
+        for pref in p.preference_history:
+            tax.scatter(
+                [(pref[0], pref[1], pref[2])],
+                color="blue",
+                alpha=0.1,
+                marker='o'
+            )
+
+    tax.left_axis_label("Paper", fontsize=12)
+    tax.right_axis_label("Scissors", fontsize=12)
+    tax.bottom_axis_label("Rock", fontsize=12)
+    tax.clear_matplotlib_ticks()
+    plt.show()
 
 def main():
     if len(sys.argv) < 2:
@@ -148,19 +155,27 @@ def main():
     print("\n Game Loaded")
     print(f"Title: {game['title']}")
     print(f"Strategies: {game['strategies']}")
-    print("Beginning simulation...\n")
 
     players = [Player(f"P{i+1}", game["num_choices"]) for i in range(10)]
+
     sessions = 50
-    for session in range(sessions):
+    for _ in range(sessions):
         run_round_robin(players, game)
 
-    print("Simulation Complete\n")
-    for p in players:
-        print(
-            f"{p.name}: preferences={p.preferences}, "
-            f"avg_score={p.total_score / p.num_games:.2f}"
-        )
+    print("\n Simulation Complete")
+
+    #pairwise plots
+    if game["num_choices"] == 2:
+        pairings = [(0,1),(2,3),(4,5),(6,7),(8,9)]
+        for i, j in pairings:
+            plot_pair(
+                players[i],
+                players[j],
+                game["strategies"],
+                game["title"]
+            )
+    else:
+        plot_rps(players)
 
 if __name__ == "__main__":
     main()
