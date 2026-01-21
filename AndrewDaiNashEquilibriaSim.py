@@ -1,6 +1,5 @@
 """
 Author: Andrew Dai
-Date: 01/20/2026
 
 AI Usage:
 None
@@ -9,17 +8,9 @@ None
 import sys
 import random
 import matplotlib.pyplot as plt
-
-#for RPS
-try:
-    import ternary
-except ImportError:
-    ternary = None
-
+import ternary
 
 class Player:
-    #represents a player in the simulation
-
     def __init__(self, name, num_choices):
         self.name = name
         self.num_choices = num_choices
@@ -99,83 +90,70 @@ def run_round_robin(players, game):
         for j in range(i + 1, len(players)):
             play_game(players[i], players[j], game)
 
-#plotting
+def plot_simplex_pair(player1, player2, strategies, title, fig_num):
+    p1_x = [p[0] for p in player1.preference_history]
+    p1_y = [1 - x for x in p1_x]
+    p2_x = [p[0] for p in player2.preference_history]
+    p2_y = [1 - x for x in p2_x]
 
-def plot_pair(player1, player2, strategies, title):
-    #scatter plot for 2-strategy games
-    p1_vals = [p[0] for p in player1.preference_history]
-    p2_vals = [p[0] for p in player2.preference_history]
-
-    sizes = [10 + i for i in range(len(p1_vals))]
-
-    plt.figure()
-    plt.scatter(
-        p1_vals,
-        p2_vals,
-        s=sizes,
-        alpha=0.4
-    )
-    plt.xlabel(f"{player1.name} prob({strategies[0]})")
-    plt.ylabel(f"{player2.name} prob({strategies[0]})")
+    sizes = [30 + i for i in range(len(p1_x))]
+    plt.figure(fig_num, figsize=(6, 6))
+    plt.scatter(p1_x, p1_y, s=sizes, alpha=0.5, label="P1", color="blue")
+    plt.scatter(p2_x, p2_y, s=sizes, alpha=0.5, label="P2", color="orange")
+    plt.plot([0, 1], [1, 0], linestyle="--", color="gray")
+    plt.xlabel(strategies[0])
+    plt.ylabel(strategies[1])
     plt.title(title)
+    plt.axis("equal")
     plt.grid(True)
-    plt.show()
+    plt.legend()
 
-
-def plot_rps(players):
-    #ternary plot for RPS
-
-    scale = 1
-    fig, tax = ternary.figure(scale=scale)
-    tax.set_title("RPS Mixed Strategy Convergence", fontsize=14)
-
-    for p in players:
-        for pref in p.preference_history:
-            tax.scatter(
-                [(pref[0], pref[1], pref[2])],
-                color="blue",
-                alpha=0.1,
-                marker='o'
-            )
-
-    tax.left_axis_label("Paper", fontsize=12)
-    tax.right_axis_label("Scissors", fontsize=12)
-    tax.bottom_axis_label("Rock", fontsize=12)
+def plot_rps_ternary(player1, player2, strategies, title):
+    fig, tax = ternary.figure(scale=1.0)
+    fig.set_size_inches(6, 6)
+    p1_points = [tuple(p) for p in player1.preference_history]
+    p2_points = [tuple(p) for p in player2.preference_history]
+    sizes = [20 + i for i in range(len(p1_points))]
+    tax.scatter(p1_points, color="blue", label="P1", s=sizes, alpha=0.6)
+    tax.scatter(p2_points, color="orange", label="P2", s=sizes, alpha=0.6)
+    tax.boundary()
+    tax.gridlines(multiple=0.1, linewidth=0.5)
+    tax.bottom_axis_label(strategies[0])
+    tax.left_axis_label(strategies[1])
+    tax.right_axis_label(strategies[2])
+    tax.set_title(title)
+    tax.legend()
     tax.clear_matplotlib_ticks()
-    plt.show()
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python main.py <game_file.txt>")
+        print("Usage: python AndrewDaiNashEquilibriaSim.py <game_file.txt>")
         sys.exit(1)
 
-    filename = sys.argv[1]
-    game = parse_game_file(filename)
-
-    print("\n Game Loaded")
-    print(f"Title: {game['title']}")
-    print(f"Strategies: {game['strategies']}")
-
+    game = parse_game_file(sys.argv[1])
     players = [Player(f"P{i+1}", game["num_choices"]) for i in range(10)]
 
-    sessions = 50
-    for _ in range(sessions):
+    for _ in range(50):
         run_round_robin(players, game)
 
-    print("\n Simulation Complete")
-
-    #pairwise plots
-    if game["num_choices"] == 2:
-        pairings = [(0,1),(2,3),(4,5),(6,7),(8,9)]
-        for i, j in pairings:
-            plot_pair(
+    #create 5 plots
+    for i in range(5):
+        if game["num_choices"] == 2:
+            plot_simplex_pair(
                 players[i],
-                players[j],
+                players[i + 1],
                 game["strategies"],
-                game["title"]
+                f"{game['title']} (P{i+1} vs P{i+2})",
+                fig_num=i + 1
             )
-    else:
-        plot_rps(players)
+        else:
+            plot_rps_ternary(
+                players[i],
+                players[i + 1],
+                game["strategies"],
+                f"{game['title']} (P{i+1} vs P{i+2})"
+            )
+    plt.show()
 
 if __name__ == "__main__":
     main()
