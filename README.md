@@ -21,9 +21,7 @@ python AndrewDaiNashEquilibriaSim.py <game_file.txt>
 For example:
 python AndrewDaiNashEquilibriaSim.py pd.txt
 
-IMPORTANT: The 5 plots will appear sequentially (e.g. the 2nd one will appear after you close the first one), not all at once
-
-<img width="773" height="579" alt="image" src="https://github.com/user-attachments/assets/98ef6903-89a5-41b7-a304-c7e41c84d152" />
-<img width="756" height="592" alt="image" src="https://github.com/user-attachments/assets/710df54a-464c-4d9a-8e4f-a61ae742fe64" />
-<img width="758" height="590" alt="image" src="https://github.com/user-attachments/assets/af2bc0aa-54bc-4518-bc52-7f4f3bfb66eb" />
-<img width="773" height="574" alt="image" src="https://github.com/user-attachments/assets/ecd1e13f-1805-4e09-9e5f-140d91eb778f" />
+<img width="707" height="700" alt="image" src="https://github.com/user-attachments/assets/3b3605c2-8243-4afd-ae20-62b6beb530a5" />
+<img width="702" height="716" alt="image" src="https://github.com/user-attachments/assets/29b4914b-b770-4d50-a885-845281f977e3" />
+<img width="715" height="732" alt="image" src="https://github.com/user-attachments/assets/6d55b2e1-bf5c-4702-829b-157334383ae7" />
+<img width="675" height="668" alt="image" src="https://github.com/user-attachments/assets/e6734468-eed7-4155-b7b8-bb643176b4c1" />
